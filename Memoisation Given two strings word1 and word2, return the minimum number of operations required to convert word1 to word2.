@@ -1,0 +1,47 @@
+class Solution {
+    public int minDistance(String word1, String word2) {
+
+                int [][] costMatrix = new int[word1.length()][word2.length()];
+                char[] word1Char = word1.toCharArray();
+                char[] word2Char = word2.toCharArray();
+                int word1Len = word1.toCharArray().length;
+                int word2Len = word2.toCharArray().length;
+                int[][] dp= new int[word1Len+1][word2Len+1];
+                for(int i=0; i <= word1Len ; i++){
+                     for(int j=0; j <= word2Len ; j++){
+                        dp[i][j]=-1; 
+                     }
+
+                }
+                int commonSubStrLen =  lcm(word1Len-1, word2Len-1, word1Char,  word2Char, dp);
+                
+                return commonSubStrLen;
+
+        
+    }
+
+    public int lcm(int i , int j, char[] word1Char, char[] word2Char, int[][] dp) {
+        // we could have sent j...but since index starts from 0 we have to send j+1
+        if (i < 0)
+            return j+1;
+ 
+        // If second string is empty, the only option is to
+        // remove all characters of first string
+        if (j < 0)
+            return i+1;
+
+        if(dp[i][j]!= -1){
+            return dp[i][j];
+        }    
+ 
+        if (word1Char[i] ==  word2Char[j])  {
+            return dp[i][j] = lcm( i-1 ,  j-1, word1Char, word2Char, dp);
+        } else{
+            // minimum of add , replace , subtract and +1 for the steps reqd to do it
+            return dp[i][j] = Math.min(
+                Math.min(lcm( i-1, j, word1Char, word2Char, dp), lcm( i, j-1, word1Char, word2Char, dp)),
+            lcm( i-1, j-1, word1Char, word2Char, dp)) + 1;
+
+        }      
+    }
+}
