@@ -1,0 +1,86 @@
+import java.util.HashMap;
+import java.util.LinkedList;
+
+class CacheData {
+    int key;
+    String value;
+    CacheData next, prev;
+    public CacheData(int key, String value){
+        key= key;
+        value= value;
+        next = null;
+        prev = null;
+    }
+    public String getValue(){
+        return value;
+    }
+    public void setValue(String value){
+        value = value;
+    }
+
+}
+
+
+public class LRUCacheDLL {
+
+    private int capacity;
+    private HashMap<Integer, CacheData> cacheMap;
+    CacheData first ;
+    CacheData last;
+
+    public LRUCacheDLL(int capacity){
+        capacity = capacity;
+        cacheMap = new HashMap<Integer, CacheData>();
+    }
+
+    public void add(int key, String value){
+        CacheData c = new CacheData(key, value);
+
+        if(cacheMap.isEmpty()){
+            cacheMap.put(key, c);
+            first = c;
+        }
+        // checking if value already exists in map and then manipulate it to bring it to first of q
+        CacheData getCacheData = get(key);
+
+        if(getCacheData==null) {
+            if(cacheMap.size() == capacity) {
+                // Cache is full -> remove LRU element from end of Q
+                last = last.prev;
+                // add the current element in front of Q
+                c.next = first;
+                first = c;
+                // now add in Map for O(1) get and put operations
+                cacheMap.put(key, c);
+            } else {
+                // add the current element in front of Q
+                c.next = first;
+                first = c;
+                // now add in Map for O(1) get and put operations
+                cacheMap.put(key, c);
+            }
+        } else{
+            // removing element from its current position and adding to first has been taken care by get
+            // updating the vallue and then updating in map
+            getCacheData.setValue(value);
+            cacheMap.put(key, getCacheData);
+        }
+    }
+
+    public CacheData get(int key){
+        // get element from Map in O(1)
+        CacheData element = cacheMap.get(key);
+        if(element != null) {
+            // checking if value already exists in map and then manipulate it to bring it to first of q as its most recently used now
+            element.prev.next= element.next;
+            element.next.prev = element.prev;
+            //
+            element.next= first;
+            first = element;
+            return element;
+        } else {
+            return null;
+        }
+    }
+
+}
