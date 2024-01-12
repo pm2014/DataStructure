@@ -1,0 +1,23 @@
+/* Given an array of strings strs, group the anagrams together. You can return the answer in any order. 
+Input: strs = ["eat","tea","tan","ate","nat","bat"]
+Output: [["bat"],["nat","tan"],["ate","eat","tea"]]
+*/
+
+
+class Solution {
+    public List<List<String>> groupAnagrams(String[] strs) {
+        HashMap<String,List<String>> map=new HashMap<>();
+
+        for(String str : strs){
+             char[] cArray=str.toCharArray();
+             Arrays.sort(cArray);
+             String s=new String(cArray);
+
+             if(!map.containsKey(s)){
+                 map.put(s, new ArrayList<>());
+             }
+             map.get(s).add(str);
+        }
+        return new ArrayList<>(map.values());
+    }
+}
