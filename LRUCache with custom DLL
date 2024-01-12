@@ -1,6 +1,5 @@
 import java.util.HashMap;
 
-
 /*
 LRU cache with HashMap & tail + head Pointer
 */
@@ -26,9 +25,7 @@ class CacheData {
     public void setValue(String value){
         value = value;
     }
-
 }
-
 
 public class LRUCacheDLL {
 
@@ -42,8 +39,6 @@ public class LRUCacheDLL {
         cacheMap = new HashMap<Integer, CacheData>();
         head = null;
         tail = null;
-        head.next=tail;
-        tail.prev = head;
     }
 
     public void add(int key, String value){
@@ -52,17 +47,18 @@ public class LRUCacheDLL {
         if(cacheMap.isEmpty()){
             cacheMap.put(key, c);
             head = c;
+            tail = c;
         }
         // checking if value already exists in map and then manipulate it to bring it to head of q
         CacheData getCacheData = get(key);
 
-        if(getCacheData==null) {
+        if(getCacheData == null) { // cache miss
             if(cacheMap.size() == capacity) {
-                // Cache is full -> remove LRU element from end of Q
                 // remove it from the cache i.e. Map
+                cacheMap.remove(tail.getKey());
+                // Cache is full -> remove LRU element from end of Q
                 tail.prev.next =null;
                 tail = tail.prev;
-                cacheMap.remove(tail.getKey());
                 // add the current element in front of Q
                 head.prev = c;
                 c.next = head;
@@ -71,18 +67,26 @@ public class LRUCacheDLL {
                 cacheMap.put(key, c);
             } else {
                 // add the current element in front of Q
-                head.prev = c;
-                c.next = head;
-                head = c;
                 // now add in Map for O(1) get and put operations
-                cacheMap.put(key, c);
+                moveToFront(c);
             }
-        } else{
+        } else { // cache hit
             // removing element from its current position and adding to head has been taken care by get
             // updating the vallue and then updating in map
             getCacheData.setValue(value);
-            cacheMap.put(key, getCacheData);
+            moveToFront(getCacheData);
         }
+    }
+
+    // add the current element in front of Q
+    // now add in Map for O(1) get and put operations
+    public void moveToFront(CacheData c) {
+        // add the current element in front of Q
+        head.prev = c;
+        c.next = head;
+        head = c;
+        // now add in Map for O(1) get and put operations
+        cacheMap.put(c.getKey(), c);
     }
 
     public CacheData get(int key){
@@ -90,16 +94,19 @@ public class LRUCacheDLL {
         CacheData element = cacheMap.get(key);
         if(element != null) {
             // checking if value already exists in map and then manipulate it to bring it to head of q as its most recently used now
+            if(element != tail) {
+                element.next.prev = element.prev;
+            }
             element.prev.next= element.next;
-            element.next.prev = element.prev;
             // adding Node to front of LL as its recently accessed
-            head.prev = element;
-            element.next= head;
-            head = element;
+            if(element != head){
+                head.prev = element;
+                element.next= head;
+                head = element;
+            }
             return element;
         } else {
             return null;
         }
     }
-
 }
