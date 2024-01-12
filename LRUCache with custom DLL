@@ -1,5 +1,9 @@
 import java.util.HashMap;
-import java.util.LinkedList;
+
+
+/*
+LRU cache with HashMap & tail + head Pointer
+*/
 
 class CacheData {
     int key;
@@ -14,6 +18,11 @@ class CacheData {
     public String getValue(){
         return value;
     }
+
+    public int getKey(){
+        return key;
+    }
+
     public void setValue(String value){
         value = value;
     }
@@ -25,12 +34,16 @@ public class LRUCacheDLL {
 
     private int capacity;
     private HashMap<Integer, CacheData> cacheMap;
-    CacheData first ;
-    CacheData last;
+    CacheData head ;
+    CacheData tail;
 
     public LRUCacheDLL(int capacity){
         capacity = capacity;
         cacheMap = new HashMap<Integer, CacheData>();
+        head = null;
+        tail = null;
+        head.next=tail;
+        tail.prev = head;
     }
 
     public void add(int key, String value){
@@ -38,29 +51,34 @@ public class LRUCacheDLL {
 
         if(cacheMap.isEmpty()){
             cacheMap.put(key, c);
-            first = c;
+            head = c;
         }
-        // checking if value already exists in map and then manipulate it to bring it to first of q
+        // checking if value already exists in map and then manipulate it to bring it to head of q
         CacheData getCacheData = get(key);
 
         if(getCacheData==null) {
             if(cacheMap.size() == capacity) {
                 // Cache is full -> remove LRU element from end of Q
-                last = last.prev;
+                // remove it from the cache i.e. Map
+                tail.prev.next =null;
+                tail = tail.prev;
+                cacheMap.remove(tail.getKey());
                 // add the current element in front of Q
-                c.next = first;
-                first = c;
+                head.prev = c;
+                c.next = head;
+                head = c;
                 // now add in Map for O(1) get and put operations
                 cacheMap.put(key, c);
             } else {
                 // add the current element in front of Q
-                c.next = first;
-                first = c;
+                head.prev = c;
+                c.next = head;
+                head = c;
                 // now add in Map for O(1) get and put operations
                 cacheMap.put(key, c);
             }
         } else{
-            // removing element from its current position and adding to first has been taken care by get
+            // removing element from its current position and adding to head has been taken care by get
             // updating the vallue and then updating in map
             getCacheData.setValue(value);
             cacheMap.put(key, getCacheData);
@@ -71,12 +89,13 @@ public class LRUCacheDLL {
         // get element from Map in O(1)
         CacheData element = cacheMap.get(key);
         if(element != null) {
-            // checking if value already exists in map and then manipulate it to bring it to first of q as its most recently used now
+            // checking if value already exists in map and then manipulate it to bring it to head of q as its most recently used now
             element.prev.next= element.next;
             element.next.prev = element.prev;
-            //
-            element.next= first;
-            first = element;
+            // adding Node to front of LL as its recently accessed
+            head.prev = element;
+            element.next= head;
+            head = element;
             return element;
         } else {
             return null;
