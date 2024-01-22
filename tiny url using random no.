@@ -1,0 +1,56 @@
+/* tiny url generation
+tiny url will be size 7 max with alphanumercharacters
+Random no. is generated with system time as seed time to make it unique throughout
+*/
+
+
+import java.util.HashMap;
+import java.util.Random;
+
+class Scratch {
+    HashMap<String, String> urlMap = new HashMap<>();
+    final static String WORLD_WIDE_WEB = "www.";
+    final static String COM = ".com";
+    final static StringBuffer RANDOM_STRING_FORMAT =  new StringBuffer ("ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890abcdefghijklmnopqrstuvwxyz");
+
+    public static void main(String[] args) {
+        Scratch s = new  Scratch();
+        String url = "www.abc.com";
+        String domain = url.split(WORLD_WIDE_WEB)[1].split(COM)[0];
+        StringBuilder sb =new StringBuilder();
+        String tinyUrl = s.getTinyUrl(domain);
+        sb.append(WORLD_WIDE_WEB);
+        sb.append(tinyUrl);
+        sb.append(COM);
+        System.out.println(sb.toString());
+        System.out.println(s.searchUrlAgainstTinyURL(tinyUrl));
+
+    }
+
+    private String getTinyUrl(String url){
+        if(urlMap.get(url)!=null){
+            return urlMap.get(url);
+        }
+        String generatedurl = generateTinyUrl(url);
+        urlMap.put(generatedurl, url);
+        return generatedurl;
+   }
+
+    private String searchUrlAgainstTinyURL(String tinyURL){
+        return urlMap.get(tinyURL);
+    }
+
+    private String generateTinyUrl(String url){
+        StringBuilder sb =new StringBuilder();
+        Random random = new Random(System.currentTimeMillis());
+        int randomInt = random.nextInt();
+        int counter =7;
+        while(randomInt>0 && counter>0) {
+            sb.append(RANDOM_STRING_FORMAT.charAt(randomInt % 10));
+            randomInt = randomInt/10;
+            counter --;
+        }
+        return sb.toString();
+    }
+
+}
