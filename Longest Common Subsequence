@@ -1,0 +1,32 @@
+class Solution {
+    public int longestCommonSubsequence(String text1, String text2) {
+        List<String> sub = new ArrayList();
+        boolean[][] mem = new boolean [text1.length()][text2.length()];
+        lcs( text1,  text2,  text1.length()-1,  text2.length()-1,  sub, mem);
+        return sub.size();
+    }
+
+    public void lcs(String text1, String text2, int index1, int index2, List<String> sub, boolean[][] mem){
+     
+        if(text1.length()==0 || text2.length()==0) {
+            return ;
+        } 
+        if(index1 <0){
+            return;
+        }
+        if(index2 <0){
+            return;
+        }
+        if(mem[index1][index2]){
+            return;
+        }
+        mem[index1][index2] = true;
+        if(text1.charAt(index1) == text2.charAt(index2)){
+            sub.add(Character.toString(text1.charAt(index1)));
+            lcs( text1,  text2,  index1-1,  index2-1,  sub, mem);
+        } else {
+            lcs( text1,  text2,  index1-1,  index2,  sub, mem);
+            lcs( text1,  text2,  index1,  index2-1,  sub, mem);
+        }
+    }
+}
